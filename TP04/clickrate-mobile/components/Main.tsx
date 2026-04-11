@@ -11,24 +11,17 @@ export default function Main({ children }: MainProps) {
 
 const styles = StyleSheet.create({
   main: {
-    flex:1,
-    width: "70%",
-    alignSelf: "center",
-    flexDirection:"column",
-    
-    padding: 20,
-    backgroundColor: "#A38A5F",
-
-    borderTopWidth: 2,
-    borderLeftWidth: 2,
-    borderBottomWidth: 2,
-    borderRightWidth: 2,
-
-    borderTopColor: "#b4a695",
-    borderLeftColor: "#b4a695",
-    borderBottomColor: "#5C462F",
-    borderRightColor: "#5C462F",
-
-    borderRadius: 8,
+  flex: 1,
+  minHeight: "70%",
+  maxWidth: "80%", //  para desktop
+  alignSelf: "center",
+  padding: 20,
+  backgroundColor: "#A38A5F",
+  borderWidth: 2,
+  borderTopColor: "#b4a695",
+  borderLeftColor: "#b4a695",
+  borderBottomColor: "#5C462F",
+  borderRightColor: "#5C462F",
+  borderRadius: 8,
   },
 });

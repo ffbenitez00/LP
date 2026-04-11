@@ -16,7 +16,7 @@ export default function TabsLayout() {
       {!mostrarSplash && <BackgroundRotator activar />}
 
       {/* HEADER */}
-      {!mostrarSplash && <Header />}
+      {!mostrarSplash && <Header/>}
 
       {/*CONTENIDO */}
       <View style={styles.content}>
@@ -37,8 +37,8 @@ const styles = StyleSheet.create({
   },
   content: {
       flex: 1,
-      width: "100%", // NECESARIO
-      alignItems: "center",
-      justifyContent: "flex-start",
+      width: "100%", // 
+      paddingTop: 80,    //altura del Header
+    paddingBottom: 80, // altura del Footer
   },
 });

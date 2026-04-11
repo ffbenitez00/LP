@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState } from "react";
-import {View,Text,Image,StyleSheet,FlatList,Animated,Pressable,ActivityIndicator,} from "react-native";
-import {useSplash} from "../context/SplashContext";
-import BackgroundRotator from "@/components/BackgroundRotator";
+import { useEffect, useState } from "react";
+import {
+  View, Text, Image, StyleSheet, Pressable, ActivityIndicator, ScrollView,
+} from "react-native";
 import Main from "@/components/Main";
+import { useWindowDimensions } from "react-native";
 
 type Skin = {
   id: number;
@@ -10,12 +11,15 @@ type Skin = {
   weapon: string;
   category: string;
   rarity: {
-  name: string;
-  color: string;
+    name: string;
+    color: string;
   };
 };
 
 export default function Skins() {
+  const { width } = useWindowDimensions();
+  const isMobile = width < 640;
+
   const [skins, setSkins] = useState<Skin[]>([]);
   const [page, setPage] = useState(1);
   const [perPage] = useState(15);
@@ -23,26 +27,24 @@ export default function Skins() {
   const [loading, setLoading] = useState(true);
 
   const API_URL = process.env.EXPO_PUBLIC_API_URL!;
-  const ASSETS_URL = process.env.EXPO_PUBLIC_ASSETS_URL!;
-
 
   useEffect(() => {
     setLoading(true);
 
     fetch(`${API_URL}/api/skins?page=${page}&limit=${perPage}`)
-      .then(res => res.json())
-      .then(json => {
+      .then((res) => res.json())
+      .then((json) => {
         setSkins(json.data);
         setTotalPages(json.totalPages);
         setLoading(false);
       })
-      .catch(err => {
+      .catch((err) => {
         console.error("Error cargando skins:", err);
         setLoading(false);
       });
   }, [page]);
 
-  const renderSkin = ({ item }: { item: Skin }) => (
+  const renderSkin = (item: Skin) => (
     <Pressable
       style={[
         styles.card,
@@ -65,55 +67,68 @@ export default function Skins() {
   );
 
   return (
-   <View style={{ flex: 1 }}>
-    <Main >
-      <Text style={styles.title}></Text>
+    <ScrollView contentContainerStyle={{ flexGrow: 1, height: "100%" }}>
+    <View style={{ flexDirection: isMobile ? "column" : "column" }}>
+     
+      {/* CONTENIDO */} 
+          <Main >
+           
+              {loading ? (
+                <ActivityIndicator size="large" />
+              ) : (
 
-      {loading ? (
-        <ActivityIndicator size="large" />
-      ) : (
-        <FlatList
-          data={skins}
-          renderItem={renderSkin}
-          keyExtractor={(item) => item.id.toString()}
-          numColumns={4}
-          style={{ flex: 1 }}
-          showsVerticalScrollIndicator
-          columnWrapperStyle={{
-            justifyContent: "space-between",
-            marginBottom: 12,
-          }}
-          contentContainerStyle={{
-            paddingBottom: 40,
-          }}
-        />
-      )}
-    </Main>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      flexWrap: "wrap",
+                      justifyContent: "space-between",
+                      gap: 12,
+                    }}
+                  >
+                    {skins.map((item) => (
+                      <View
+                        key={item.id}
+                        style={{
+                          width: isMobile ? "100%" : "23%",
+                          marginBottom: 12,
+                        }}
+                      >
+                        {renderSkin(item)}
+                      </View>
+                    ))}
+                  </View>
+              )}  
 
-    {/* PAGINACIÓN FUERA DEL MAIN */}
-    <View style={styles.pagination}>
-      {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-        <Pressable
-          key={p}
-          onPress={() => setPage(p)}
-          style={[
-            styles.pageButton,
-            p === page && styles.pageSelected,
-          ]}
-        >
-          <Text style={styles.pageText}>{p}</Text>
-        </Pressable>
-      ))}
+          </Main>
+       
+        {/* PAGINACIÓN */}
+          <View
+            style={[
+              styles.pagination,
+              isMobile ? styles.paginationMobile : styles.paginationDesktop,
+
+            ]}
+          >
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+              <Pressable
+                key={p}
+                onPress={() => setPage(p)}
+                style={[
+                  styles.pageButton,
+                  p === page && styles.pageSelected,
+                ]}
+              >
+                <Text style={styles.pageText}>{p}</Text>
+              </Pressable>
+            ))}
+          </View>
+      
     </View>
-  </View>
+   </ScrollView>
   );
 }
-const styles = StyleSheet.create({
-  container: {
-    padding: 16,
-    alignItems: "center", 
-  },
 
+const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: "bold",
@@ -122,8 +137,6 @@ const styles = StyleSheet.create({
   },
 
   card: {
-    width: "45%", 
-    flex: 1,
     padding: 12,
     borderRadius: 12,
     alignItems: "center",
@@ -145,16 +158,16 @@ const styles = StyleSheet.create({
   },
 
   pagination: {
-    flexDirection: "row",
-    justifyContent: "center",
-    gap: 8,
-    marginVertical: 16,
+    width: 80,
+    alignItems: "center",
+    paddingTop: 20,
   },
 
   pageButton: {
     padding: 8,
     borderRadius: 6,
     backgroundColor: "#ccc",
+    marginBottom: 6,
   },
 
   pageSelected: {
@@ -163,5 +176,22 @@ const styles = StyleSheet.create({
 
   pageText: {
     fontWeight: "bold",
+  },
+
+  paginationDesktop: {
+   
+    alignSelf: "center",
+    flexDirection: "row",
+    alignItems: "center",
+    paddingTop: 20,
+    gap: 10,
+  },
+
+  paginationMobile: {
+    flexDirection: "row",
+    
+    flexWrap: "wrap",
+    paddingVertical: 10,
+    gap: 10,
   },
 });

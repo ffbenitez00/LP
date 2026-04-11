@@ -66,7 +66,8 @@ export default function BackgroundRotator({ activar = true }: Props) {
 
 const styles = StyleSheet.create({
   image: {
-    flex: 1,
+  
+    height: "100%",
   },
 });
 

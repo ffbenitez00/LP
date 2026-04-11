@@ -1,7 +1,3 @@
-
-
-
-
 import { View, Text, Image, Pressable, StyleSheet } from "react-native";
 import {useRouter} from "expo-router";
 
@@ -56,6 +52,10 @@ export default function Header() {
 
 const styles = StyleSheet.create({
   container: {
+    position:"absolute",
+    top:0,
+    width: "100%",
+    zIndex: 10,
     backgroundColor: "#A38A5F",
     padding: 8,
     borderRadius: 10,
@@ -72,11 +72,12 @@ const styles = StyleSheet.create({
   navtop: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
+    width: "100%"
   },
 
   logo: {
-    padding: 5,
+    flex: 1,
+    padding: 5
   },
 
   logoImg: {
@@ -89,6 +90,9 @@ const styles = StyleSheet.create({
   navLinks: {
     flexDirection: "row",
     gap: 12,
+    flex: 1,
+    flexWrap: "wrap",
+    justifyContent: "center"
   },
 
   navButton: {
@@ -112,7 +116,8 @@ const styles = StyleSheet.create({
   },
 
   userMenu: {
-    position: "relative",
+    flex:1,
+    alignItems: "flex-end"
   },
 
   userIcon: {

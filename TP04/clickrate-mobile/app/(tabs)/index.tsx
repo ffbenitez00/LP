@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import {View,Text, StyleSheet, Animated,Pressable} from "react-native";
+import {View,Text, StyleSheet, Animated,Pressable,ScrollView} from "react-native";
 import {useSplash} from "../context/SplashContext";
 import BackgroundRotator from "@/components/BackgroundRotator";
 import Main from "@/components/Main";
@@ -91,13 +91,16 @@ export default function Index() {
     return (
       <View style={styles.container}>
       {/* CONTENIDO */}
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
       <View >
         <Main>
           <View style={styles.home}>
             <Text style={styles.homeText}>HOME / INDEX</Text>
           </View>
         </Main>
-      </View>
+       
+      </View> 
+      </ScrollView>
     </View>
     );
   }
