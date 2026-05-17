@@ -1,25 +1,35 @@
-const API_URL = "/api";
+//codigo del cliente toma los datos del formulario y hace fetch al backend
+const API_URL = "http://192.168.X.X:3000/api";
 
-document.getElementById("registerForm").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  
-  const form = new FormData(e.target);
+router.post("/register", async (req, res) => {
+  const { email, password, confirmPassword, nickname } = req.body;
 
-  const data = {
-    email: form.get("email"),
-    password: form.get("password"),
-    confirmPassword: form.get("confirmPassword"),
-    nickname: form.get("nickname")
-  };  
+  if (!email || !password || !confirmPassword || !nickname) {
+    return res.status(400).json({ error: "Faltan datos" });
+  }
 
-  const res = await fetch(API_URL+`/register`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data)
-  });
+  if (password !== confirmPassword) {
+    return res.status(400).json({ error: "Las contraseñas no coinciden" });
+  }
 
-  const json = await res.json();
+  const users = loadUsers();
 
-  document.getElementById("msg").innerText =
-    json.error ? "❌ " + json.error : "✅ " + json.message;
+  const exists = users.find(u => u.email === email);
+  if (exists) {
+    return res.status(400).json({ error: "Usuario ya existe" });
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  const newUser = {
+    id: users.length + 1,
+    email,
+    password: hashedPassword,
+    nickname
+  };
+
+  users.push(newUser);
+  saveUsers(users);
+
+  res.json({ message: "Usuario registrado correctamente" });
 });

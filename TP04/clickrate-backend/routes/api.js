@@ -1,9 +1,20 @@
 import { Router } from "express";
 import fs from "fs";
 import path from "path";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 
+//definimos los endpoints de la API
 const router = Router();
+const usersPath = path.join(process.cwd(), "data", "users.json");
+function loadUsers() {
+  if (!fs.existsSync(usersPath)) return [];
+  return JSON.parse(fs.readFileSync(usersPath, "utf-8"));
+}
 
+function saveUsers(users) {
+  fs.writeFileSync(usersPath, JSON.stringify(users, null, 2));
+}
 
 // PATHS
 const skinsPath = path.join(process.cwd(), "data", "skins.json");

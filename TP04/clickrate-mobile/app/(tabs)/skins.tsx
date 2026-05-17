@@ -4,7 +4,8 @@ import {
 } from "react-native";
 import Main from "@/components/Main";
 import { useWindowDimensions } from "react-native";
-
+import { router } from "@/.expo/types/router";
+import {useRouter} from "expo-router";
 type Skin = {
   id: number;
   name: string;
@@ -27,7 +28,7 @@ export default function Skins() {
   const [loading, setLoading] = useState(true);
 
   const API_URL = process.env.EXPO_PUBLIC_API_URL!;
-
+  const router = useRouter();//
   useEffect(() => {
     setLoading(true);
 
@@ -50,6 +51,12 @@ export default function Skins() {
         styles.card,
         { backgroundColor: item.rarity.color },
       ]}
+     onPress={() =>
+    router.push({
+      pathname: "../skin",
+      params: { id: String(item.id) },
+    })
+  }
     >
       <Image
         source={{ uri: `${API_URL}/api/skin-img/${item.id}` }}
@@ -71,12 +78,10 @@ export default function Skins() {
     <View style={{ flexDirection: isMobile ? "column" : "column" }}>
      
       {/* CONTENIDO */} 
-          <Main >
-           
+          <Main >      
               {loading ? (
                 <ActivityIndicator size="large" />
               ) : (
-
                   <View
                     style={{
                       flexDirection: "row",
@@ -122,9 +127,9 @@ export default function Skins() {
               </Pressable>
             ))}
           </View>
-      
+    
     </View>
-   </ScrollView>
+    </ScrollView>  
   );
 }
 
@@ -140,6 +145,15 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 12,
     alignItems: "center",
+    borderWidth: 2,
+    borderColor: 'rgba(255,255,255,0.2)', // 🔥 contraste suave
+
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+
+    elevation: 6,
   },
 
   image: {

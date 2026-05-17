@@ -3,11 +3,27 @@ import cors from "cors";
 import path from "path";
 import apiRoutes from "./routes/api.js";
 import dotenv from "dotenv";
+import jwt from "jsonwebtoken";
+
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+const verifyToken = (req, res, next) => {
+  const auth = req.headers.authorization;
+  if (!auth) {
+    return res.status(401).json({ error: "Acceso no autorizado" });
+  }
+  try {
+    const token = auth.split(" ")[1];
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded;
+    next();
+  } catch (error) {
+    return res.status(401).json({ error: "Token inválido" });
+  }
+};
 // middlewares
 app.use(cors());
 app.use(express.json());
@@ -22,8 +38,11 @@ app.use("/crates-img", express.static(path.join(process.cwd(), "img/crate")))
 // API (JSON)
 app.use("/api", apiRoutes);
 
-app.listen(PORT, () => {
- console.log("PORT:", process.env.PORT);
+app.get('/items', verifyToken, (req, res) => {
+  res.json({ data: 'Solo usuarios logueados' });
+});
+app.listen(PORT, "0.0.0.0", () => {
+  console.log("Server corriendo en puerto", PORT);
 });
 
 /*import express from "express"

@@ -3,8 +3,10 @@ import {View,Text,Image, StyleSheet, Animated,Pressable,ActivityIndicator} from 
 import {useSplash} from "../context/SplashContext";
 import BackgroundRotator from "@/components/BackgroundRotator";
 import Main from "@/components/Main";
-
 import { useRouter, useLocalSearchParams } from "expo-router";
+import { useWindowDimensions } from "react-native";
+import { router } from "@/.expo/types/router";
+
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL!;
 const ASSETS_URL = process.env.EXPO_PUBLIC_ASSETS_URL!;
@@ -24,7 +26,8 @@ type CratesResponse = {
 export default function Crates() {
   const router = useRouter();
   const params = useLocalSearchParams();
-
+  const { width } = useWindowDimensions();
+  const isMobile = width < 640;
   const page = Number(params.page) || 1;
 
   const [crates, setCrates] = useState<Crate[]>([]);
@@ -48,54 +51,58 @@ export default function Crates() {
   }, [page]);
 
   return (
-    <Main>
-        <View style={styles.container}>
-          {loading ? (
-            <ActivityIndicator size="large" />
-          ) : (
-            <View style={styles.grid}>
-              {crates.map(caja => (
-                <Pressable
-                  key={caja.id}
-                  style={styles.card}
-                  onPress={() =>
-                  router.push({
-                      pathname: "/case",
-                      params: { id: caja.id },
-                  })
-                }
-                >
-                  <Image
-                  source={{ uri: `${API_URL}/crates-img/${caja.id}.png` }}
-                  style={styles.image}
-                  resizeMode="contain"
-                  onError={(e) =>
-                    console.log("❌ Error cargando imagen:", caja.id, e.nativeEvent)
+    <View style={{ flexDirection: isMobile ? "column" : "column" }}>
+      <Main>
+          <View style={styles.container}>
+            {loading ? (
+              <ActivityIndicator size="large" />
+            ) : (
+              <View style={styles.grid}>
+                {crates.map(caja => (
+                  <Pressable
+                    key={caja.id}
+                    style={styles.card}
+                    onPress={() =>
+                    router.push({
+                        pathname: "/case",
+                        params: { id: caja.id },
+                    })
                   }
-                />
-                  <Text style={styles.title}>{caja.name}</Text>
+                  >
+                    <View style={styles.imageContainer}>
+                        <Image
+                        source={{ uri: `${API_URL}/crates-img/${caja.id}.png` }}
+                        style={styles.image}
+                        resizeMode="contain"
+                        onError={(e) =>
+                          console.log(" Error cargando imagen:", caja.id, e.nativeEvent)
+                        }
+                      />
+                    </View>
+                    <Text style={styles.title}>{caja.name}</Text>
+                  </Pressable>
+                ))}
+              </View>
+            )}
+
+            {/* PAGINACIÓN */}
+            <View style={styles.pagination}>
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
+                <Pressable
+                  key={p}
+
+                  style={[
+                    styles.pageButton,
+                    p === page && styles.pageSelected,
+                  ]}
+                >
+                  <Text>{p}</Text>
                 </Pressable>
               ))}
             </View>
-          )}
-
-          {/* PAGINACIÓN */}
-          <View style={styles.pagination}>
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
-              <Pressable
-                key={p}
-
-                style={[
-                  styles.pageButton,
-                  p === page && styles.pageSelected,
-                ]}
-              >
-                <Text>{p}</Text>
-              </Pressable>
-            ))}
           </View>
-        </View>
-    </Main>
+      </Main>
+    </View>
   );
 }
 
@@ -110,33 +117,34 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     gap: 16,
     justifyContent: "center",
+    maxWidth: 900,  //  evita que se estire demasiado
   },
 
   card: {
-    width: 160,
+    width: 170,
     padding: 12,
-    borderRadius: 8,
+    borderRadius: 10,
     backgroundColor: "#eee",
     alignItems: "center",
   },
 
   imageContainer: {
     width: "100%",
-    height: 110,          // 🔑 altura fija
+    height: 120,          //altura fija
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 8,
+    marginBottom: 10,
   },
   image: {
     width: "100%",
     height: "100%",
   },
-
     
   title: {
     fontWeight: "bold",
     textAlign: "center",
-    fontSize: 14,
+    fontSize: 13,
+    color: "#333",
   },
 
   pagination: {
