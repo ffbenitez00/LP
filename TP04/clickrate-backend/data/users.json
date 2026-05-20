@@ -1,8 +1,17 @@
 [
-   {
+  {
     "id": 1,
     "email": "test@mail.com",
     "password": "$2b$10$abc123HASH...",
     "name": "Juan"
+  },
+  {
+    "id": "1779233897374",
+    "email": "JAMIROTOMASZUNIGA@GMAIL.COM",
+    "password": "$2b$10$ZZJX2mIhfg86Bgevp1wvkuuWQ/4V8cA0nkJf3xg0P063.iNnArDYm",
+    "inventory": {
+      "crates": [],
+      "skins": []
+    }
   }
 ]

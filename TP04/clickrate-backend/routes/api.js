@@ -16,6 +16,119 @@ function saveUsers(users) {
   fs.writeFileSync(usersPath, JSON.stringify(users, null, 2));
 }
 
+router.post("/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    const users = loadUsers();
+
+    // buscar usuario
+    const user = users.find(u => u.email === email);
+
+    if (!user) {
+      return res.status(400).json({
+        error: "Usuario no encontrado"
+      });
+    }
+
+    // comparar password
+    const validPassword = await bcrypt.compare(
+      password,
+      user.password
+    );
+
+    if (!validPassword) {
+      return res.status(400).json({
+        error: "Contraseña incorrecta"
+      });
+    }
+
+    // generar token
+    const token = jwt.sign(
+      {
+        id: user.id,
+        email: user.email,
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "7d",
+      }
+    );
+
+    res.json({
+      success: true,
+
+      token,
+
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        inventory: user.inventory,
+      }
+    });
+
+  } catch (err) {
+    console.error(err);
+
+    res.status(500).json({
+      error: "Error del servidor"
+    });
+  }
+});
+
+router.post("/register", async (req, res) => {
+  try {
+    const { username, email, password } = req.body;
+
+    const users = loadUsers();
+
+    // verificar email existente
+    const exists = users.find(u => u.email === email);
+
+    if (exists) {
+      return res.status(400).json({
+        error: "El usuario ya existe"
+      });
+    }
+
+    // hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newUser = {
+      id: Date.now().toString(),
+      username,
+      email,
+      password: hashedPassword,
+
+      inventory: {
+        crates: [],
+        skins: [],
+      }
+    };
+
+    users.push(newUser);
+
+    saveUsers(users);
+
+    res.json({
+      success: true,
+      user: {
+        id: newUser.id,
+        username: newUser.username,
+        email: newUser.email,
+      }
+    });
+
+  } catch (err) {
+    console.error(err);
+
+    res.status(500).json({
+      error: "Error del servidor"
+    });
+  }
+});
+
 // PATHS
 const skinsPath = path.join(process.cwd(), "data", "skins.json");
 const cratesPath = path.join(process.cwd(), "data", "crates.json");
@@ -43,7 +156,6 @@ router.get("/backgrounds", (req, res) => {
     ],
   });
 });
-
 
 // SKINS API
 router.get("/skins", (req, res) => {
@@ -75,6 +187,43 @@ router.get("/skin-img/:id", (req, res) => {
   });
 });
 
+router.get("/crates/:id", (req, res) => {
+  const crates = loadCrates();
+
+  const crate = crates.find(c => c.id === req.params.id);
+
+  if (!crate) {
+    return res.status(404).json({ error: "Crate no encontrada" });
+  }
+
+  res.json(crate);
+});
+
+router.get("/crates/:id/skins", (req, res) => {
+  const crates = loadCrates();
+  const skins = loadSkins();
+
+  const crate = crates.find(c => c.id === req.params.id);
+
+  if (!crate) {
+    return res.status(404).json({ error: "Crate no encontrada" });
+  }
+
+  const result = skins.filter((skin) =>
+    crate.contains.some((c) => c.id === skin.id)
+  );
+
+  const rare = crate.contains_rare
+    ? skins.filter((skin) =>
+        crate.contains_rare.some((c) => c.id === skin.id)
+      )
+    : [];
+
+  res.json({
+    normal: result,
+    rare,
+  });
+});
 
 // CRATES API
 router.get("/crates", (req, res) => {
@@ -104,6 +253,45 @@ router.get("/crates-img/:id", (req, res) => {
   res.sendFile(filePath, err => {
     if (err) res.status(404).json({ error: "Imagen de caja no encontrada" });
   });
+  router.post("/users/inventory/crates", (req, res) => {
+      const { userId, crateId } = req.body;
+
+      const users = loadUsers();
+
+      const user = users.find(u => u.id === userId);
+
+      if (!user) {
+        return res.status(404).json({
+          error: "Usuario no encontrado"
+        });
+      }
+
+      if (!user.inventory) {
+        user.inventory = {
+          crates: [],
+          skins: [],
+        };
+      }
+
+      const existente = user.inventory.crates.find(
+        c => c.id === crateId
+      );
+
+      if (existente) {
+        existente.quantity += 1;
+      } else {
+        user.inventory.crates.push({
+          id: crateId,
+          quantity: 1,
+        });
+      }
+
+      saveUsers(users);
+
+      res.json({
+        success: true
+      });
+    });
 });
 export default router;
 /*import express from "express"

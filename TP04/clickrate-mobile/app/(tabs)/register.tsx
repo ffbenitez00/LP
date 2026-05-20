@@ -11,7 +11,7 @@ export default function RegisterScreen() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [nickname, setNickname] = useState("");
   const [msg, setMsg] = useState("");
-
+  console.log("API:", process.env.EXPO_PUBLIC_API_URL);
   const handleRegister = async () => {
     try {
       const res = await api.post("/register", {
@@ -21,23 +21,29 @@ export default function RegisterScreen() {
         nickname,
       });
 
-      setMsg("✅ " + res.data.message);
+      setMsg("error " + res.data.message);
     } catch (err: any) {
-      setMsg("❌ " + (err.response?.data?.error || "Error"));
+      setMsg((err.response?.data?.error || "Error"));
     }
   };
 
   return (
      <Main>
         <View style={styles.container}>
-          <Text>Registro</Text>
-
-          <TextInput placeholder="Email" value={email} onChangeText={setEmail} style={styles.input} />
-          <TextInput placeholder="Nickname" value={nickname} onChangeText={setNickname} style={styles.input} />
-
-          <TextInput placeholder="Password" secureTextEntry value={password} onChangeText={setPassword} style={styles.input} />
-          <TextInput placeholder="Confirm Password" secureTextEntry value={confirmPassword} onChangeText={setConfirmPassword} style={styles.input} />
-
+          <Text style={styles.title}>Registro</Text>
+          
+          <View style={styles.inputContainer}>
+             <TextInput placeholder="Email" value={email} onChangeText={setEmail} style={styles.input} />
+          </View>
+          <View style={styles.inputContainer}>
+             <TextInput placeholder="Nickname" value={nickname} onChangeText={setNickname} style={styles.input} />
+          </View>
+          <View style={styles.inputContainer}>
+            <TextInput placeholder="Password" secureTextEntry value={password} onChangeText={setPassword} style={styles.input} />
+          </View>
+          <View style={styles.inputContainer}>
+            <TextInput placeholder="Confirm Password" secureTextEntry value={confirmPassword} onChangeText={setConfirmPassword} style={styles.input} />
+          </View>
           <Button title="Registrarse" onPress={handleRegister} />
 
           <Text>{msg}</Text>
@@ -47,10 +53,31 @@ export default function RegisterScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { padding: 20 },
+  container: { 
+    width: "100%",
+    maxWidth: 420,
+    alignSelf: "center",
+    padding: 24,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: "bold",
+    marginBottom: 24,
+    textAlign: "center",
+    color: "#fff",
+  },
+  inputContainer: {
+    marginBottom: 16,
+    backgroundColor: "#f1f5f9",
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: "#cbd5e1",
+    overflow: "hidden",
+  },
+
   input: {
-    borderWidth: 1,
-    marginVertical: 5,
-    padding: 10,
+    padding: 14,
+    fontSize: 16,
+    color: "#000",
   },
 });

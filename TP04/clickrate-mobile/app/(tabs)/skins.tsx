@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
-import {
-  View, Text, Image, StyleSheet, Pressable, ActivityIndicator, ScrollView,
-} from "react-native";
+import { View, Text, Image, StyleSheet, Pressable, ActivityIndicator, ScrollView,useWindowDimensions} from "react-native";
 import Main from "@/components/Main";
-import { useWindowDimensions } from "react-native";
+import PageScroll from "@/components/PageScroll";
 import { router } from "@/.expo/types/router";
 import {useRouter} from "expo-router";
+
 type Skin = {
   id: number;
   name: string;
@@ -74,7 +73,7 @@ export default function Skins() {
   );
 
   return (
-    <ScrollView contentContainerStyle={{ flexGrow: 1, height: "100%" }}>
+    <PageScroll>
     <View style={{ flexDirection: isMobile ? "column" : "column" }}>
      
       {/* CONTENIDO */} 
@@ -129,7 +128,7 @@ export default function Skins() {
           </View>
     
     </View>
-    </ScrollView>  
+    </PageScroll>  
   );
 }
 

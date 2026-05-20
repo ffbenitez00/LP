@@ -50,7 +50,7 @@ export default function Header() {
 
         {/* LOGO */}
         <Pressable
-          style={styles.logo}
+          style={[styles.logo, isMobile && styles.logoDerecha]}
           onPress={() => router.replace("/")}
         >
           <Image
@@ -60,6 +60,7 @@ export default function Header() {
                 : require("../assets/img/ClickRateImagotipo.png")
             }
             style={isMobile ? styles.logoMobile : styles.logoImg}
+            resizeMode="contain"
           />
         </Pressable>
 
@@ -181,7 +182,7 @@ export default function Header() {
 
 const styles = StyleSheet.create({
   container: {
-    position:"absolute",
+    flexDirection: "row",
     top:0,
     width: "100%",
     zIndex: 10,
@@ -213,7 +214,9 @@ const styles = StyleSheet.create({
   burger: {
   fontSize: 26,
   },
-
+  logoDerecha: {
+    marginLeft: "auto",
+  },
   logoImg: {
     height: 80,
     width: 80,

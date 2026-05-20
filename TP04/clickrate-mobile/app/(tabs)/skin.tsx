@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
 import {
-  View, Text, Image, StyleSheet, Pressable, ActivityIndicator, ScrollView,
+  View, Text, Image, StyleSheet, Pressable, ActivityIndicator, ScrollView, useWindowDimensions 
 } from "react-native";
 import Main from "@/components/Main";
-import { useWindowDimensions } from "react-native";
 import BackgroundRotator from "@/components/BackgroundRotator";
 import { useLocalSearchParams } from 'expo-router';
 import { api } from "../../services/api";
